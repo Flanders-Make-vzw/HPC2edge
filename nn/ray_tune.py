@@ -131,7 +131,6 @@ def train_hpc_edge(config):
             "name": "OneWaySP",
             "num_workers": 7,
             "data_fp": config["data_dir"],
-            #"data_fp": "/p/project1/jureap57/AM_data/RAISE_LPBF_C027.hdf5",
             "num_frames": 16,
             "crop_size": 224,
             "side_size": 224,
@@ -278,7 +277,7 @@ def main(args):
         # name of the training run (directory name).
         name="AM_training",
         # directory to store the ray tune results in .
-        storage_path="/p/project1/jureap57/",
+        storage_path="./",
         # logger
         progress_reporter=reporter,
         # stopping criterion when to end the optimization process

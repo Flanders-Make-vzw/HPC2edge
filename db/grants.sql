@@ -11,6 +11,7 @@ GRANT SELECT ON TABLE edge_measurements TO hpc2edge_hpc;
 GRANT SELECT ON TABLE edge_devices TO hpc2edge_hpc;
 GRANT SELECT ON TABLE network_architectures TO hpc2edge_hpc;
 GRANT INSERT ON TABLE network_architectures TO hpc2edge_hpc;
+GRANT USAGE, SELECT ON SEQUENCE network_architectures_id_seq TO hpc2edge_hpc;
 
 GRANT SELECT ON TABLE edge_measurements TO hpc2edge_edge;
 GRANT SELECT ON TABLE edge_devices TO hpc2edge_edge;
@@ -22,3 +23,4 @@ GRANT INSERT ON TABLE edge_measurements TO hpc2edge_edge;
 GRANT SELECT ON TABLE evaluation_measure, task_type, estimation_procedure_type, estimation_procedure, benchmarks, benchmark_result TO hpc2edge_hpc, hpc2edge_edge, hpc2edge;
 GRANT INSERT ON TABLE benchmark_result TO hpc2edge_hpc;
 GRANT USAGE, SELECT ON SEQUENCE benchmark_result_id_seq TO hpc2edge_hpc;
+GRANT USAGE, SELECT ON SEQUENCE edge_measurements_id_seq TO hpc2edge_edge;

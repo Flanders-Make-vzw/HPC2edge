@@ -101,6 +101,8 @@ def train(cfg: utils.Config):
         ### Training
         model.train()  # Set the model to train mode
 
+        running_train_loss = 0.0
+        running_valid_loss = 0.0
         for batch_idx, (
             inputs,
             targets,
@@ -123,6 +125,7 @@ def train(cfg: utils.Config):
                 "Training",
                 epoch * len(train_loader) + batch_idx,
             )
+            running_train_loss += loss.item()
         scheduler.step()
         utils.log_scalars(
             writer,
@@ -132,6 +135,7 @@ def train(cfg: utils.Config):
             "Training",
             epoch,
         )
+
 
     start_time = time.time()
     
@@ -154,6 +158,7 @@ def train(cfg: utils.Config):
                 "Validation",
                 epoch * len(valid_loader) + batch_idx,
             )
+
     end_time = time.time() - start_time
     
     os.makedirs("tune_model", exist_ok=True)
@@ -167,6 +172,7 @@ def train(cfg: utils.Config):
     
     
     return running_val_loss/len(valid_loader), checkpoint
+
 
 
 if __name__ == "__main__":

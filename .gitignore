@@ -1,5 +1,15 @@
 users.sql
-.env
+.env*
 __pycache__/
 runs/
 ray_results/
+.venv/
+*.pkl
+*.log
+*.pt
+*.txt
+!requirements.txt
+_*
+!__init__.py
+*.err
+*.out

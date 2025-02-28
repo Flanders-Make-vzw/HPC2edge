@@ -32,8 +32,6 @@ class CenterWindowSample(torch.nn.Module):
         super().__init__()
         self.window_size = window_size
 
-        print("Center Window Sample")
-
     def forward(self, frames: torch.Tensor) -> torch.Tensor:
         if frames.shape[1] < self.window_size:
             new = torch.zeros(frames.shape[0], self.window_size, *frames.shape[2:])
@@ -102,6 +100,8 @@ class FramesSP(Dataset):
         yoffset=20,
         power_mean=215,
         speed_mean=900,
+        start_ratio=0.,
+        end_ratio=1.0,
         **_
     ):
         self.repeat_frames = repeat_frames
@@ -109,24 +109,27 @@ class FramesSP(Dataset):
         self.speed_mean, self.power_mean = speed_mean, power_mean
         self.data_fp = data_fp
         self.test = test
+        self.start_ratio = start_ratio
+        self.end_ratio = end_ratio
 
         # retrieving length
         with h5py.File(self.data_fp, "r") as h5f:
-            self.layer_cumsums = [
-                np.cumsum(
+            self.layer_cumsums = [np.cumsum(
                     [
-                        len(np.unique(h5f[o][l]["scan_line_index"][:]))
-                        for l in h5f[o].keys()
+                        len(np.unique(h5f[l]["scan_line_index"][:]))
+                        for l in h5f.keys()
                     ]
-                )
-                for o in h5f.keys()
-            ]
-            self.obj_cumsum = np.cumsum([o[-1] for o in self.layer_cumsums])
+                )]
+            
+            self.obj_cumsum = [self.layer_cumsums[-1][-1]]
             self._len = self.obj_cumsum[-1]
+            self._len = int(self._len * (self.end_ratio - self.start_ratio))
+            
 
     def __getitem__(self, index):
         # retrieve object, layer, scanline
-        object_i = np.argwhere(self.obj_cumsum - index - 1 >= 0)[0][0]
+        index = int(index + self.start_ratio * self._len)
+        object_i = 0
         rindex = index if object_i == 0 else index - self.obj_cumsum[object_i - 1]
         layer_i = np.argwhere(self.layer_cumsums[object_i] - 1 - rindex >= 0)[0][0]
         rindex = (
@@ -136,12 +139,11 @@ class FramesSP(Dataset):
         )
         scan_line_i = rindex
         with h5py.File(self.data_fp, "r") as h5f:  # open once ?
-            object = list(h5f.keys())[object_i]
-            layer = list(h5f[object].keys())[layer_i]
-            indices = np.where(h5f[object][layer]["scan_line_index"][:] == scan_line_i)
-            frames = h5f[object][layer]["frame"][indices]
+            layer = f"layer{layer_i:04d}"
+            indices = np.where(h5f[layer]["scan_line_index"][:] == scan_line_i)
+            frames = h5f[layer]["frame"][indices]
             if not self.test:
-                speed, power = h5f[object][layer]["laser_params"][scan_line_i]
+                speed, power = h5f[layer]["laser_params"][scan_line_i]
 
         # crop frames around max intensity of mean frame
         i, j = np.unravel_index(frames.mean(0).argmax(), frames[0].shape)
@@ -185,9 +187,11 @@ class OneWaySP(FramesSP):
         repeat_frames=True,
         test=False,
         deterministic=False,
+        start_ratio=0.,
+        end_ratio=1.0,
         **kwargs
     ):
-        super().__init__(data_fp, repeat_frames=repeat_frames, test=test, **kwargs)
+        super().__init__(data_fp, repeat_frames=repeat_frames, test=test, start_ratio=start_ratio, end_ratio=end_ratio, **kwargs)
 
         _mean = [mean for _ in range(3)] if repeat_frames else [mean]
         _std = [std for _ in range(3)] if repeat_frames else [std]
@@ -204,47 +208,6 @@ class OneWaySP(FramesSP):
         if deterministic:
             # replace first transform with CenterWindowSample
             self.preprocess.transforms[0] = CenterWindowSample(num_frames)
-
-    def __getitem__(self, index):
-        frames, y = super().__getitem__(index)
-
-        x = self.preprocess(frames)
-
-        return x, y
-
-
-class TwoWaysSP(FramesSP):
-    """
-    Pytorch Dataset to interface the RAISE-LPBF-Laser benchmark data for two-way models like SlowFast.
-    """
-
-    def __init__(
-        self,
-        data_fp,
-        mean=0.45,
-        std=0.225,
-        num_frames=32,
-        crop_size=256,
-        side_size=256,
-        slowfast_alpha=4,
-        repeat_frames=True,
-        **kwargs
-    ):
-        super().__init__(data_fp, repeat_frames=repeat_frames, **kwargs)
-
-        _mean = [mean for _ in range(3)] if repeat_frames else [mean]
-        _std = [std for _ in range(3)] if repeat_frames else [std]
-
-        self.preprocess = tvt.Compose(
-            [
-                vid_tvt.UniformTemporalSubsample(num_frames),
-                vid_tvt.Div255(),
-                vid_tvt.Normalize(_mean, _std),
-                vid_tvt.ShortSideScale(size=side_size),
-                VideoCenterCrop(crop_size),
-                PackPathway(slowfast_alpha),
-            ]
-        )
 
     def __getitem__(self, index):
         frames, y = super().__getitem__(index)

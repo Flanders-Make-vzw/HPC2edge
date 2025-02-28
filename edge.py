@@ -77,6 +77,13 @@ while True:
                 logging.info(
                     f"Running inference on {device} with batch_size={batch_size}"
                 )
+                if na["name"] not in ["Swin3D"]:
+                    logging.info(
+                        f"{na['name']} not supported on EDGE, defaulting to next Swin3D"
+                    )
+                    na["name"] = "Swin3D"
+                    # continue
+
                 res = infer_test(
                     model_name=na["name"],
                     batch_size=batch_size,

@@ -1,3 +1,4 @@
 #!/usr/bin/env bash
-. .env/bin/activate
+here=$(cd "$(dirname "$0")" && pwd)s
+. $here/../.env/bin/activate
 python training.py $1

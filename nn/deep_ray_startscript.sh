@@ -17,7 +17,7 @@ ml Stages/2023 CUDA/11.7 Python PostgreSQL/14.4
 
 . .env/bin/activate
 
-COMMAND="ray_tune.py --scheduler NEVERGRAD --num-samples 64 --par-workers 4 --max-iterations 1 --data-dir '/p/project1/jureap57/AM_data/RAISE_LPBF_C027.hdf5' "
+COMMAND="ray_tune.py --scheduler NEVERGRAD --num-samples 64 --par-workers 4 --max-iterations 1 --data-dir './data/AM_data/RAISE_LPBF_C027.hdf5' "
 
 echo $COMMAND
 

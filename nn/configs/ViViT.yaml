@@ -15,7 +15,7 @@ model:
 dataset:
   name: OneWaySP
   num_workers: 8
-  data_fp: /p/project/raise-ctp2/train/RAISE_LPBF_train.hdf5
+  data_fp: ./data/RAISE_LPBF_train.hdf5
   num_frames: 16
   crop_size: 224
   side_size: 224
@@ -29,3 +29,6 @@ training:
   step_size: 10
   gamma: 0.5
   save_each: -1
+
+inference:
+  in_size: [1,16,224,224]

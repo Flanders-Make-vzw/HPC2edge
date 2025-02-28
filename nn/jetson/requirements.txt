@@ -1,0 +1,13 @@
+https://developer.download.nvidia.cn/compute/redist/jp/v511/pytorch/torch-2.0.0+nv23.05-cp38-cp38-linux_aarch64.whl
+numpy
+h5py
+pytorchvideo
+torchvision
+pyyaml
+pathlib
+tensorboard
+tqdm
+timm
+packaging
+einops
+jetson-stats # needs sudo rights to be installed outside of venv then inside
