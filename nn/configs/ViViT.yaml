@@ -1,0 +1,31 @@
+model:
+  name: ViViT
+  in_channels: 1 # number of input image channels
+  # model hyperparams
+  image_size: 224 # square image size in pixel (width and height) # NOTE: to be matched with dataset.crop_size and dataset.side_size
+  patch_size: 16 # patch size
+  num_frames: 16 # number of input frames # NOTE: to be matched with dataset.num_frames
+  num_classes: 400 # Penultimate hidden dim size
+  dim: 192 # transformer embedding dim
+  depth: 4 # transformer depth
+  heads: 3 # transformer heads
+  dim_head: 64 # transformer head dim
+  scale_dim: 4 # Ratio of mlp hidden dim to embedding dim
+
+dataset:
+  name: OneWaySP
+  num_workers: 8
+  data_fp: /p/project/raise-ctp2/train/RAISE_LPBF_train.hdf5
+  num_frames: 16
+  crop_size: 224
+  side_size: 224
+  repeat_frames: False
+
+training:
+  split_pct: 0.8
+  num_epochs: 1
+  batchsize: 32
+  lr: 0.001
+  step_size: 10
+  gamma: 0.5
+  save_each: -1

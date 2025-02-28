@@ -1,0 +1,12 @@
+numpy
+h5py
+torch
+pytorchvideo
+torchvision
+pyyaml
+pathlib
+tensorboard
+tqdm
+timm
+packaging
+einops

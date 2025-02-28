@@ -1,0 +1,29 @@
+model:
+  name: Swin3D
+  in_chans: 1 # Number of input image channels
+  # model hyperparams
+  patch_size: [2,4,4] # Patch size
+  embed_dim: 96 # Number of linear projection output channels
+  depths: [2, 2, 6, 2] # Depths of each Swin Transformer stage
+  num_heads: [3, 6, 12, 24] # Number of attention head of each stage
+  window_size: [8, 7, 7] # Window size
+  mlp_ratio: 4. # Ratio of mlp hidden dim to embedding dim
+  num_classes: 400 # Penultimate hidden dim size
+
+dataset:
+  name: OneWaySP
+  num_workers: 8
+  data_fp: /p/project/raise-ctp2/train/RAISE_LPBF_train.hdf5
+  num_frames: 16
+  crop_size: 224
+  side_size: 224
+  repeat_frames: False
+
+training:
+  split_pct: 0.8
+  num_epochs: 100
+  batchsize: 16
+  lr: 0.001
+  step_size: 10
+  gamma: 0.5
+  save_each: -1
